@@ -53,5 +53,6 @@
     "*.{json,css,md}": [
       "prettier --write"
     ]
-  }
+  },
+  "license": "MIT"
 }
