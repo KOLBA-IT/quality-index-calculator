@@ -1,51 +1,50 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { useQualityStore } from "./shared/store/useQualityStore";
+import GroupCard from "./pages/Calculator/GroupCard";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+export default function App() {
+  // Читаем веса групп и экшн их изменения
+  const groupWeights = useQualityStore((s) => s.groupWeights);
+  const setGroupWeight = useQualityStore((s) => s.setGroupWeight);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  // Читаем все введённые значения
+  const inputs = useQualityStore((s) => s.inputs);
+
+  const handleCheck = () => {
+    console.log("Все значения:", inputs);
+    console.log("Веса групп:", groupWeights);
+  };
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
+    <div className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Тест приложения</h1>
 
-      <div className="row">
-        <a href="https://vite.dev" target="_blank" rel="noreferrer">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank" rel="noreferrer">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      {/* Блок редактирования весов групп */}
+      <div className="border rounded p-4 mb-6">
+        <h2 className="text-lg font-semibold mb-2">Веса групп</h2>
+        {Object.entries(groupWeights).map(([group, weight]) => (
+          <label key={group} className="flex items-center gap-2 mb-2">
+            <span className="w-16">{group}</span>
+            <input
+              type="number"
+              step="0.01"
+              value={weight}
+              onChange={(e) => setGroupWeight(group, Number(e.target.value))}
+              className="border rounded px-2 py-1 w-24"
+            />
+          </label>
+        ))}
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
 
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
+      {/* Карточка для группы IRP */}
+      <GroupCard group="IRP" />
+
+      {/* Кнопка проверки */}
+      <button
+        onClick={handleCheck}
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
       >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+        Проверить (лог в консоль)
+      </button>
+    </div>
   );
 }
-
-export default App;
