@@ -18,11 +18,13 @@ export default function GroupCard({ group }: { group: GroupKey }) {
       {cfg.fields.map((f) => (
         <InputRow
           key={f.key}
-          unit={f.unit}
+          min={f.min}
+          max={f.max}
           label={f.label}
+          unit={f.unit}
           placeholder={f.placeholder}
           value={groupInputs[f.key] ?? ""}
-          onChange={(v) => setInput(group, f.key, Number(v))}
+          onChange={(v) => setInput(group, f.key, v)}
         />
       ))}
     </section>

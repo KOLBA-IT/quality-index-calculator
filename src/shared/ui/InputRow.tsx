@@ -4,6 +4,8 @@ type Props = {
   value: number | "";
   onChange: (v: number | "") => void;
   placeholder?: string;
+  min?: number;
+  max?: number;
 };
 
 export default function InputRow({
@@ -12,6 +14,8 @@ export default function InputRow({
   value,
   onChange,
   placeholder,
+  min,
+  max,
 }: Props) {
   return (
     <label className="flex flex-col gap-1 mb-3">
@@ -20,9 +24,12 @@ export default function InputRow({
         {unit ? `, ${unit}` : ""}
       </span>
       <input
+        required
         type="number"
         inputMode="decimal"
         className="border rounded px-3 py-2"
+        min={min}
+        max={max}
         value={value}
         placeholder={placeholder}
         onChange={(e) => {
