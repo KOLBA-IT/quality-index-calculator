@@ -265,13 +265,22 @@ export const GROUPS: Record<GroupKey, GroupConfig> = {
 };
 
 type InputState = Record<GroupKey, Record<string, number | "">>;
+type WeightState = Record<GroupKey, Record<string, number>>;
 
 type Store = {
   inputs: InputState;
+  weights: WeightState;
+  groupResults: Record<GroupKey, number | null>;
   groupWeights: Record<GroupKey, number>;
   setInput: (group: GroupKey, key: string, value: number | "") => void;
-  setGroupWeight: (group: GroupKey, value: number) => void;
-  reset: () => void;
+  setIndicatorWeights: (
+    group: GroupKey,
+    weights: Record<string, number>,
+  ) => void;
+  setGroupWeights: (weights: Record<GroupKey, number>) => void;
+  setGroupResult: (group: GroupKey, value: number) => void;
+  resetGroup: (group: GroupKey) => void;
+  resetAll: () => void;
 };
 
 const emptyGroup = (g: GroupKey) =>
@@ -280,15 +289,51 @@ const emptyGroup = (g: GroupKey) =>
     ""
   >;
 
+const generateInitialWeights = (g: GroupKey) => {
+  const weight = 1 / GROUPS[g].fields.length;
+  return Object.fromEntries(
+    GROUPS[g].fields.map((f) => [f.key, weight]),
+  ) as Record<string, number>;
+};
+
+const initialInputs: InputState = {
+  IRP: emptyGroup("IRP"),
+  ICZ: emptyGroup("ICZ"),
+  IKD: emptyGroup("IKD"),
+  IPE: emptyGroup("IPE"),
+  IAP: emptyGroup("IAP"),
+};
+
+const initialWeights: WeightState = {
+  IRP: generateInitialWeights("IRP"),
+  ICZ: generateInitialWeights("ICZ"),
+  IKD: generateInitialWeights("IKD"),
+  IPE: generateInitialWeights("IPE"),
+  IAP: generateInitialWeights("IAP"),
+};
+
+const initialGroupResults: Record<GroupKey, number | null> = {
+  IRP: null,
+  ICZ: null,
+  IKD: null,
+  IPE: null,
+  IAP: null,
+};
+
+const initialGroupWeights: Record<GroupKey, number> = {
+  IRP: 0.2,
+  ICZ: 0.2,
+  IKD: 0.2,
+  IPE: 0.2,
+  IAP: 0.2,
+};
+
 export const useQualityStore = create<Store>((set) => ({
-  inputs: {
-    IRP: emptyGroup("IRP"),
-    ICZ: {},
-    IKD: {},
-    IPE: {},
-    IAP: {},
-  },
-  groupWeights: { IRP: 0.2, ICZ: 0.2, IKD: 0.2, IPE: 0.2, IAP: 0.2 },
+  inputs: initialInputs,
+  weights: initialWeights,
+  groupResults: initialGroupResults,
+  groupWeights: initialGroupWeights,
+
   setInput: (group, key, value) =>
     set((state) => ({
       inputs: {
@@ -299,18 +344,42 @@ export const useQualityStore = create<Store>((set) => ({
         },
       },
     })),
-  setGroupWeight: (group, value) =>
+
+  setIndicatorWeights: (group, newWeights) =>
     set((state) => ({
-      groupWeights: { ...state.groupWeights, [group]: value },
-    })),
-  reset: () =>
-    set(() => ({
-      inputs: {
-        IRP: emptyGroup("IRP"),
-        ICZ: {},
-        IKD: {},
-        IPE: {},
-        IAP: {},
+      weights: {
+        ...state.weights,
+        [group]: newWeights,
       },
+    })),
+
+  setGroupWeights: (newWeights) =>
+    set(() => ({
+      groupWeights: newWeights,
+    })),
+
+  setGroupResult: (group, value: number | null) =>
+    set((state) => ({
+      groupResults: { ...state.groupResults, [group]: value },
+    })),
+
+  resetGroup: (group) =>
+    set((state) => ({
+      inputs: {
+        ...state.inputs,
+        [group]: emptyGroup(group),
+      },
+      weights: {
+        ...state.weights,
+        [group]: generateInitialWeights(group),
+      },
+    })),
+
+  resetAll: () =>
+    set(() => ({
+      inputs: initialInputs,
+      weights: initialWeights,
+      groupResults: initialGroupResults,
+      groupWeights: initialGroupWeights,
     })),
 }));
