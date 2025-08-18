@@ -26,7 +26,7 @@ export default function InputRow({
           {label}
           {unit ? `, ${unit}` : ""}
         </span>
-        <span className="text-sm ">Вес:</span>
+        <span className="text-sm w-13">Вес:</span>
       </div>
 
       <div className="flex gap-3">

@@ -277,8 +277,8 @@ type Store = {
     group: GroupKey,
     weights: Record<string, number>,
   ) => void;
-  setGroupWeights: (weights: Record<GroupKey, number>) => void;
-  setGroupResult: (group: GroupKey, value: number) => void;
+  setGroupWeight: (group: GroupKey, value: number | null) => void;
+  setGroupResult: (group: GroupKey, value: number | null) => void;
   resetGroup: (group: GroupKey) => void;
   resetAll: () => void;
 };
@@ -353,9 +353,9 @@ export const useQualityStore = create<Store>((set) => ({
       },
     })),
 
-  setGroupWeights: (newWeights) =>
-    set(() => ({
-      groupWeights: newWeights,
+  setGroupWeight: (group, value) =>
+    set((state) => ({
+      groupWeights: { ...state.groupWeights, [group]: value },
     })),
 
   setGroupResult: (group, value: number | null) =>
