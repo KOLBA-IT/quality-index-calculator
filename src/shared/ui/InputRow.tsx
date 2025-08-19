@@ -49,7 +49,7 @@ export default function InputRow({
           }}
         />
         <div className="flex items-center justify-center w-15 rounded bg-gray-200 text-gray-400">
-          {weight}
+          {weight.toFixed(2)}
         </div>
       </div>
     </div>

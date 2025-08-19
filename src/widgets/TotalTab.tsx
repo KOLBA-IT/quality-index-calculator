@@ -48,6 +48,9 @@ export default function TotalTab() {
                 inputMode="decimal"
                 className="px-3 py-2 rounded border w-25"
                 placeholder="0.2"
+                min={0}
+                max={1}
+                step={0.1}
                 onChange={(e) => {
                   const raw = e.target.value;
                   if (raw === "") {
