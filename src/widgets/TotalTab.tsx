@@ -2,6 +2,7 @@ import React from "react";
 import { GroupKey, GROUPS } from "../shared/store/useQualityStore";
 import { useQualityStore } from "../shared/store/useQualityStore";
 import { calcResultIndex } from "../entities/quality/calc";
+import RadarModal from "./RadarModal";
 
 export default function TotalTab() {
   const cfg = GROUPS;
@@ -11,6 +12,16 @@ export default function TotalTab() {
   const resetAll = useQualityStore((s) => s.resetAll);
 
   const [result, setResult] = React.useState<number | null>(null);
+  const [radarOpen, setRadarOpen] = React.useState<boolean>(false);
+  const openRadar = () => setRadarOpen(true);
+  const closeRadar = () => setRadarOpen(false);
+
+  const radarData = React.useMemo(() => {
+    return Object.keys(groupResults).map((keyResult) => ({
+      name: GROUPS[keyResult as GroupKey].title,
+      value: groupResults[keyResult as GroupKey]!,
+    }));
+  }, [groupResults]);
 
   const handleResult = () => {
     const idx = calcResultIndex(groupResults, groupWeights);
@@ -21,6 +32,10 @@ export default function TotalTab() {
     resetAll();
     setResult(null);
   };
+
+  function allFilled(groupResults: Record<GroupKey, number | null>): boolean {
+    return Object.values(groupResults).every((res) => Number.isFinite(res));
+  }
 
   return (
     <section className="border rounded p-4 mb-6">
@@ -79,12 +94,26 @@ export default function TotalTab() {
         >
           Сбросить всё
         </button>
+        <button
+          className={`px-4 py-2 rounded text-white cursor-pointer
+            ${
+              allFilled(groupResults)
+                ? "bg-purple-600  hover:bg-purple-700 active:bg-purple-800 transition"
+                : "bg-purple-300 cursor-not-allowed"
+            } `}
+          disabled={!allFilled(groupResults)}
+          onClick={openRadar}
+        >
+          Сделать радарную диаграмму
+        </button>
       </div>
 
       <div className="mt-3">
         <span className="font-medium">Результат:</span>{" "}
         {result === null ? "" : result.toFixed(2)}
       </div>
+
+      {radarOpen && <RadarModal closeRadar={closeRadar} data={radarData} />}
     </section>
   );
 }

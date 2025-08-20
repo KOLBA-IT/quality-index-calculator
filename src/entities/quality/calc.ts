@@ -31,7 +31,6 @@ export function calcGroupIndex(
     const inputValue = groupInputs[f.key];
     if (inputValue === "") continue;
     result += normalizeByField(f, inputValue) * groupWeights[f.key];
-    console.log(inputValue, normalizeByField(f, inputValue), result);
   }
 
   return result;
